@@ -22,7 +22,7 @@ class Shooter(object):
     
 
     def start(self):        
-        self.__videoHash = SVPlayerHash.ComputerFileHash("testidx.avi")
+        self.__videoHash = SVPlayerHash.ComputerFileHash(self.__fileName)
         values = dict(filehash = self.__videoHash, pathinfo = self.__fileName, format = "json", lang = "Chn")
         data = urllib.urlencode(values)
         req = urllib2.Request(self.__SHOOTERURL, data)
