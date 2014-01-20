@@ -34,7 +34,7 @@ class Shooter(object):
             print(jsonContent[i])
             
             if jsonContent[i]["Delay"] != 0:
-                delayFileName = self.__fileName + ".chn" +"" if i==0 else str(i) + ".delay"
+                delayFileName = self.__fileName + ".chn" +("" if i==0 else str(i)) + ".delay"
                 output = open(delayFileName, 'w');
                 output.write(str(jsonContent[i]["Delay"]))
                 output.close()
