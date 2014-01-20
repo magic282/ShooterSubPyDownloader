@@ -15,4 +15,3 @@ if __name__ == '__main__':
         shooter = Shooter(f)
         shooter.start()
     
-    pass
