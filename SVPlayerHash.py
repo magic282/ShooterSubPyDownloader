@@ -16,7 +16,7 @@ class SVPlayerHash(object):
     '''
 
     @staticmethod
-    def  ComputerFileHash(fileName):
+    def  ComputeFileHash(fileName):
         ret = ""
         try:
             vfile = open(fileName, "rb")
@@ -26,22 +26,13 @@ class SVPlayerHash(object):
         statinfo = os.stat(fileName)
         fLength = statinfo.st_size
                 
-        offset = [0] * 4
-        offset[3] = fLength - 8 * 1024
-        offset[2] = fLength / 3
-        offset[1] = fLength / 3 * 2
-        offset[0] = 4 * 1024
-        
-        for i in range(4):
-            vfile.seek(offset[i], 0)
-            bBuf = vfile.read(1024 * 4)
-            m = hashlib.md5()
-            m.update(bBuf)
-            if i != 0 :
-                ret += ";"
-            ret += m.hexdigest()
+        ret = []
+        for i in (4096, int(fLength/3)*2, int(fLength/3), fLength-8192):
+            vfile.seek(i, 0)
+            bBuf = vfile.read(4096)
+            ret.append(hashlib.md5(bBuf).hexdigest())
         vfile.close()
-        return ret
+        return ';'.join(ret)
 
     def __init__(self, params):
         '''
