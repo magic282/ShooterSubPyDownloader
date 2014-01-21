@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 '''
 Created on Jan 20, 2014
 
@@ -8,7 +8,7 @@ https://docs.google.com/document/d/1w5MCBO61rKQ6hI5m9laJLWse__yTYdRugpVyz4RzrmM/
 '''
 
 import os
-import md5
+import hashlib
 
 class SVPlayerHash(object):
     '''
@@ -21,7 +21,7 @@ class SVPlayerHash(object):
         try:
             vfile = open(fileName, "rb")
         except IOError:
-            print("Cannot read file " + fileName)
+            print("Cannot read file %s" % fileName)
         
         statinfo = os.stat(fileName)
         fLength = statinfo.st_size
@@ -35,7 +35,7 @@ class SVPlayerHash(object):
         for i in range(4):
             vfile.seek(offset[i], 0)
             bBuf = vfile.read(1024 * 4)
-            m = md5.new()
+            m = hashlib.md5()
             m.update(bBuf)
             if i != 0 :
                 ret += ";"
