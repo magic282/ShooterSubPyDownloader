@@ -10,22 +10,23 @@ https://docs.google.com/document/d/1w5MCBO61rKQ6hI5m9laJLWse__yTYdRugpVyz4RzrmM/
 import os
 import hashlib
 
+
 class SVPlayerHash(object):
     '''
     classdocs
     '''
 
     @staticmethod
-    def  ComputeFileHash(fileName):
+    def ComputeFileHash(fileName):
         ret = ""
         try:
             vfile = open(fileName, "rb")
         except IOError:
             print("Cannot read file %s" % fileName)
-        
+
         statinfo = os.stat(fileName)
         fLength = statinfo.st_size
-                
+
         ret = []
         for i in (4096, int(fLength/3)*2, int(fLength/3), fLength-8192):
             vfile.seek(i, 0)
@@ -38,4 +39,3 @@ class SVPlayerHash(object):
         '''
         Constructor
         '''
-        

@@ -14,31 +14,31 @@ except ImportError:  # Python 2
     from urllib2 import Request, urlopen
 import json
 
+
 class Shooter(object):
     '''
     classdocs
     '''
-    
+
     __SHOOTERURL = "http://shooter.cn/api/subapi.php"
-    
+
     __fileName = ""
     __videoHash = ""
-    
-    __subInfo = []
-    
 
-    def start(self):        
+    __subInfo = []
+
+    def start(self):
         self.__videoHash = SVPlayerHash.ComputeFileHash(self.__fileName)
-        values = dict(filehash = self.__videoHash, pathinfo = self.__fileName, format = "json", lang = "Chn")
+        values = dict(filehash=self.__videoHash, pathinfo=self.__fileName, format="json", lang="Chn")
         data = urlencode(values).encode('utf-8', 'replace')
         req = Request(self.__SHOOTERURL, data)
         rsp = urlopen(req)
         content = rsp.read().decode('utf-8', 'replace')
-        
+
         jsonContent = json.loads(content)
         for idx_i, i in enumerate(jsonContent):
             print(i)
-            
+
             if i["Delay"] != 0:
                 delayFileName = '.'.join((self.__fileName, "chn%s" % ("" if idx_i == 0 else idx_i), "delay"))
                 with open(delayFileName, 'w') as output:
@@ -52,12 +52,11 @@ class Shooter(object):
                 print(dLink)
                 response = urlopen(dLink)
                 backF = response.read()
-                with open(outFileName,'wb') as output:
+                with open(outFileName, 'wb') as output:
                     output.write(backF)
-            
+
     def __init__(self, params):
         '''
         Constructor
         '''
         self.__fileName = params
-        
