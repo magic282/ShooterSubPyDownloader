@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Created on Jan 20, 2014
 
@@ -5,52 +6,57 @@ Created on Jan 20, 2014
 '''
 
 from SVPlayerHash import SVPlayerHash
-import urllib, urllib2
+try:  # Python 3
+    from urllib.parse import urlencode
+    from urllib.request import Request, urlopen
+except ImportError:  # Python 2
+    from urllib import urlencode
+    from urllib2 import Request, urlopen
 import json
+
 
 class Shooter(object):
     '''
     classdocs
     '''
-    
+
     __SHOOTERURL = "http://shooter.cn/api/subapi.php"
-    
+
     __fileName = ""
     __videoHash = ""
-    
-    __subInfo = []
-    
 
-    def start(self):        
-        self.__videoHash = SVPlayerHash.ComputerFileHash(self.__fileName)
-        values = dict(filehash = self.__videoHash, pathinfo = self.__fileName, format = "json", lang = "Chn")
-        data = urllib.urlencode(values)
-        req = urllib2.Request(self.__SHOOTERURL, data)
-        rsp = urllib2.urlopen(req)
-        content = rsp.read()
-        
+    __subInfo = []
+
+    def start(self):
+        self.__videoHash = SVPlayerHash.ComputeFileHash(self.__fileName)
+        values = dict(filehash=self.__videoHash, pathinfo=self.__fileName, format="json", lang="Chn")
+        data = urlencode(values).encode('utf-8', 'replace')
+        req = Request(self.__SHOOTERURL, data)
+        rsp = urlopen(req)
+        content = rsp.read().decode('utf-8', 'replace')
+
         jsonContent = json.loads(content)
-        for i in range(len(jsonContent)):
-            print(jsonContent[i])
-            
-            if jsonContent[i]["Delay"] != 0:
-                delayFileName = self.__fileName + ".chn" +("" if i==0 else str(i)) + ".delay"
-                output = open(delayFileName, 'w');
-                output.write(str(jsonContent[i]["Delay"]))
-                output.close()
-            for j in range(len(jsonContent[i]["Files"])):
-                outFileName = self.__fileName + ".chn" + ("" if i==0 else str(i)) + ("" if (len(jsonContent[i]["Files"]) == 1) else ("." + str(j))) + (".") + (jsonContent[i]["Files"][j]["Ext"])
-                dLink = jsonContent[i]["Files"][j]["Link"]
+        for idx_i, i in enumerate(jsonContent):
+            print(i)
+
+            if i["Delay"] != 0:
+                delayFileName = '.'.join((self.__fileName, "chn%s" % ("" if idx_i == 0 else idx_i), "delay"))
+                with open(delayFileName, 'w') as output:
+                    output.write(str(i["Delay"]))
+            for idx_j, j in enumerate(i["Files"]):
+                outFileNameList = [self.__fileName, "chn%s" % ("" if idx_i == 0 else idx_i), str(j["Ext"])]
+                if len(i["Files"]) != 1:
+                    outFileNameList.insert(2, str(idx_j))
+                outFileName = '.'.join(outFileNameList)
+                dLink = j["Link"]
                 print(dLink)
-                response = urllib2.urlopen(dLink)
+                response = urlopen(dLink)
                 backF = response.read()
-                output = open(outFileName,'wb')
-                output.write(backF)
-                output.close()
-            
+                with open(outFileName, 'wb') as output:
+                    output.write(backF)
+
     def __init__(self, params):
         '''
         Constructor
         '''
         self.__fileName = params
-        

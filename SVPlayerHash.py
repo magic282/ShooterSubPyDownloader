@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Created on Jan 20, 2014
 
@@ -7,7 +8,8 @@ https://docs.google.com/document/d/1w5MCBO61rKQ6hI5m9laJLWse__yTYdRugpVyz4RzrmM/
 '''
 
 import os
-import md5
+import hashlib
+
 
 class SVPlayerHash(object):
     '''
@@ -15,35 +17,25 @@ class SVPlayerHash(object):
     '''
 
     @staticmethod
-    def  ComputerFileHash(fileName):
+    def ComputeFileHash(fileName):
         ret = ""
         try:
             vfile = open(fileName, "rb")
         except IOError:
-            print("Cannot read file " + fileName)
-        
+            print("Cannot read file %s" % fileName)
+
         statinfo = os.stat(fileName)
         fLength = statinfo.st_size
-                
-        offset = [0] * 4
-        offset[3] = fLength - 8 * 1024
-        offset[2] = fLength / 3
-        offset[1] = fLength / 3 * 2
-        offset[0] = 4 * 1024
-        
-        for i in range(4):
-            vfile.seek(offset[i], 0)
-            bBuf = vfile.read(1024 * 4)
-            m = md5.new()
-            m.update(bBuf)
-            if i != 0 :
-                ret += ";"
-            ret += m.hexdigest()
+
+        ret = []
+        for i in (4096, int(fLength/3)*2, int(fLength/3), fLength-8192):
+            vfile.seek(i, 0)
+            bBuf = vfile.read(4096)
+            ret.append(hashlib.md5(bBuf).hexdigest())
         vfile.close()
-        return ret
+        return ';'.join(ret)
 
     def __init__(self, params):
         '''
         Constructor
         '''
-        
